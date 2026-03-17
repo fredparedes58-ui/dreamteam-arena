@@ -3,6 +3,7 @@ import { Plus, Trophy, Users, TrendingUp, Calendar, Eye, Edit, BarChart3, ArrowL
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 import tournament1 from "@/assets/tournament-1.jpg";
 import tournament2 from "@/assets/tournament-2.jpg";
@@ -22,10 +23,19 @@ const quickStats = [
 const Club = () => {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
+  const { toast } = useToast();
+
+  const handlePublish = () => {
+    setShowForm(false);
+    toast({ title: "🎉 Torneo creado", description: "Tu torneo ha sido enviado para revisión. Recibirás una notificación cuando sea aprobado." });
+  };
+
+  const handleAction = (action: string, name: string) => {
+    toast({ title: `${action}`, description: `Acción realizada sobre "${name}"` });
+  };
 
   return (
     <div className="min-h-screen bg-background pb-8">
-      {/* Header */}
       <div className="sticky top-0 z-30 glass border-b border-border/50 px-4 pt-12 pb-4">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
@@ -39,7 +49,6 @@ const Club = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 space-y-6 mt-4">
-        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {quickStats.map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass rounded-xl p-4">
@@ -50,14 +59,12 @@ const Club = () => {
           ))}
         </div>
 
-        {/* Create tournament CTA */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <Button onClick={() => setShowForm(!showForm)} className="w-full bg-gradient-neon text-primary-foreground font-display font-bold py-6 rounded-xl text-base glow-green gap-2">
             <Plus className="w-5 h-5" /> Crear nuevo torneo
           </Button>
         </motion.div>
 
-        {/* Create tournament form */}
         {showForm && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="glass rounded-2xl p-6 space-y-4">
             <h2 className="text-lg font-display font-bold text-foreground">Nuevo torneo</h2>
@@ -81,12 +88,11 @@ const Club = () => {
             </div>
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setShowForm(false)} className="flex-1 font-display">Cancelar</Button>
-              <Button className="flex-1 bg-gradient-neon text-primary-foreground font-display font-bold glow-green">Publicar torneo</Button>
+              <Button onClick={handlePublish} className="flex-1 bg-gradient-neon text-primary-foreground font-display font-bold glow-green">Publicar torneo</Button>
             </div>
           </motion.div>
         )}
 
-        {/* My tournaments */}
         <div>
           <h2 className="text-lg font-display font-bold text-foreground mb-3">Mis torneos</h2>
           <div className="space-y-3">
@@ -108,20 +114,19 @@ const Club = () => {
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-sm font-display font-bold text-primary">€{t.revenue.toLocaleString()}</span>
                       <div className="flex gap-1">
-                        <button className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/10 transition-colors">
+                        <button onClick={() => navigate(`/torneo/${t.id}`)} className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/10 transition-colors">
                           <Eye className="w-3.5 h-3.5 text-muted-foreground" />
                         </button>
-                        <button className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/10 transition-colors">
+                        <button onClick={() => handleAction("✏️ Editando", t.name)} className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/10 transition-colors">
                           <Edit className="w-3.5 h-3.5 text-muted-foreground" />
                         </button>
-                        <button className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/10 transition-colors">
+                        <button onClick={() => handleAction("📊 Estadísticas", t.name)} className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/10 transition-colors">
                           <BarChart3 className="w-3.5 h-3.5 text-muted-foreground" />
                         </button>
                       </div>
                     </div>
                   </div>
                 </div>
-                {/* Progress */}
                 <div className="mt-3 h-1 bg-muted rounded-full overflow-hidden">
                   <div className="h-full bg-primary rounded-full" style={{ width: `${(t.teams / t.maxTeams) * 100}%` }} />
                 </div>
@@ -130,16 +135,19 @@ const Club = () => {
           </div>
         </div>
 
-        {/* Pending actions */}
         <div className="glass rounded-xl p-4">
           <h3 className="font-display font-bold text-foreground text-sm mb-3">Acciones pendientes</h3>
           <div className="space-y-2">
             {[
-              { text: "3 solicitudes de inscripción pendientes", icon: Clock, type: "warning" },
-              { text: "Verificación de documentos completada", icon: CheckCircle, type: "success" },
-              { text: "Actualizar reglamento Summer Beach Cup", icon: AlertTriangle, type: "warning" },
+              { text: "3 solicitudes de inscripción pendientes", icon: Clock, type: "warning", action: "📋 Revisando solicitudes" },
+              { text: "Verificación de documentos completada", icon: CheckCircle, type: "success", action: "✅ Documentos verificados" },
+              { text: "Actualizar reglamento Summer Beach Cup", icon: AlertTriangle, type: "warning", action: "📝 Abriendo editor de reglamento" },
             ].map((action) => (
-              <div key={action.text} className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary/50 cursor-pointer transition-all">
+              <div
+                key={action.text}
+                onClick={() => handleAction(action.action, "")}
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary/50 cursor-pointer transition-all"
+              >
                 <action.icon className={`w-4 h-4 flex-shrink-0 ${action.type === "success" ? "text-primary" : "text-pulse"}`} />
                 <span className="text-xs text-muted-foreground">{action.text}</span>
               </div>

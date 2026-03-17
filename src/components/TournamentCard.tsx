@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { MapPin, Calendar, Users, Star, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Tournament {
   id: number;
@@ -17,6 +18,7 @@ interface Tournament {
 }
 
 const TournamentCard = ({ tournament, index }: { tournament: Tournament; index: number }) => {
+  const navigate = useNavigate();
   const fillPercent = Math.round((tournament.teams / tournament.maxTeams) * 100);
   const isAlmostFull = fillPercent > 80;
 
@@ -29,6 +31,7 @@ const TournamentCard = ({ tournament, index }: { tournament: Tournament; index: 
       transition={{ duration: 0.4, delay: index * 0.1 }}
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
+      onClick={() => navigate(`/torneo/${tournament.id}`)}
     >
       {/* Image */}
       <div className="relative h-48 overflow-hidden">

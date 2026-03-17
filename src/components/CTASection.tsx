@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CTASection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative overflow-hidden rounded-2xl glass p-8 md:p-12">
-      {/* Glow effects */}
       <div className="absolute -top-20 -right-20 w-60 h-60 bg-primary/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-accent/10 rounded-full blur-3xl" />
 
@@ -30,6 +32,7 @@ const CTASection = () => {
         </div>
 
         <motion.button
+          onClick={() => navigate("/club")}
           className="shrink-0 flex items-center gap-2 px-8 py-4 bg-gradient-neon text-primary-foreground font-display font-bold rounded-xl glow-green"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

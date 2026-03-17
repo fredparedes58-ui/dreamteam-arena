@@ -93,7 +93,7 @@ const Index = () => {
             <h2 className="text-xl md:text-2xl font-display font-bold text-foreground">
               Torneos <span className="text-gradient-neon">Destacados</span>
             </h2>
-            <button className="text-sm text-accent font-display hover:underline">Ver todos</button>
+            <button onClick={() => window.location.href = "/torneos"} className="text-sm text-accent font-display hover:underline">Ver todos</button>
           </motion.div>
 
           <CategoryFilter />
