@@ -45,7 +45,7 @@ const BottomNav = () => {
             return (
               <motion.button
                 key={item.id}
-                onClick={() => setActive(item.id)}
+                onClick={() => navigate(item.path)}
                 className="flex flex-col items-center gap-0.5 py-2 px-3"
                 whileTap={{ scale: 0.9 }}
               >
