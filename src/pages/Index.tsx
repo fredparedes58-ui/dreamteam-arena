@@ -5,6 +5,8 @@ import BottomNav from "@/components/BottomNav";
 import LivePulse from "@/components/LivePulse";
 import QuickStats from "@/components/QuickStats";
 import CTASection from "@/components/CTASection";
+import ProjectEvaluator from "@/components/ProjectEvaluator";
+import AppMockups from "@/components/AppMockups";
 import { motion } from "framer-motion";
 
 import tournament1 from "@/assets/tournament-1.jpg";
