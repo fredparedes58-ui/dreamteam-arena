@@ -1,17 +1,20 @@
 import { motion } from "framer-motion";
 import { Home, Search, Zap, Trophy, User } from "lucide-react";
-import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const navItems = [
-  { id: "home", icon: Home, label: "Inicio" },
-  { id: "search", icon: Search, label: "Explorar" },
-  { id: "predict", icon: Zap, label: "" },
-  { id: "tournaments", icon: Trophy, label: "Torneos" },
-  { id: "profile", icon: User, label: "Perfil" },
+  { id: "home", icon: Home, label: "Inicio", path: "/" },
+  { id: "search", icon: Search, label: "Explorar", path: "/explorar" },
+  { id: "predict", icon: Zap, label: "", path: "/" },
+  { id: "tournaments", icon: Trophy, label: "Torneos", path: "/torneos" },
+  { id: "profile", icon: User, label: "Perfil", path: "/perfil" },
 ];
 
 const BottomNav = () => {
-  const [active, setActive] = useState("home");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const getActive = () => navItems.find((i) => i.path === location.pathname)?.id || "home";
+  const active = getActive();
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50">
@@ -26,7 +29,7 @@ const BottomNav = () => {
               return (
                 <motion.button
                   key={item.id}
-                  onClick={() => setActive(item.id)}
+                  onClick={() => navigate(item.path)}
                   className="relative -mt-6 w-14 h-14 rounded-2xl bg-gradient-neon flex items-center justify-center glow-green"
                   whileTap={{ scale: 0.9 }}
                   whileHover={{ scale: 1.1 }}
@@ -42,7 +45,7 @@ const BottomNav = () => {
             return (
               <motion.button
                 key={item.id}
-                onClick={() => setActive(item.id)}
+                onClick={() => navigate(item.path)}
                 className="flex flex-col items-center gap-0.5 py-2 px-3"
                 whileTap={{ scale: 0.9 }}
               >

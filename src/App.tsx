@@ -4,6 +4,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
+import Explorar from "./pages/Explorar.tsx";
+import Torneos from "./pages/Torneos.tsx";
+import Perfil from "./pages/Perfil.tsx";
+import TorneoDetail from "./pages/TorneoDetail.tsx";
+import Club from "./pages/Club.tsx";
+import Admin from "./pages/Admin.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -16,7 +22,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/explorar" element={<Explorar />} />
+          <Route path="/torneos" element={<Torneos />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/torneo/:id" element={<TorneoDetail />} />
+          <Route path="/club" element={<Club />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
