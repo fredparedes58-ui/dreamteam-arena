@@ -10,10 +10,10 @@ const stats = [
 ];
 
 const menuItems = [
-  { label: "Mi equipo", icon: Shield, path: "#" },
-  { label: "Mis inscripciones", icon: Trophy, path: "#" },
-  { label: "Notificaciones", icon: Bell, path: "#" },
-  { label: "Configuración", icon: Settings, path: "#" },
+  { label: "Mi equipo", icon: Shield, path: "/mi-equipo" },
+  { label: "Mis inscripciones", icon: Trophy, path: "/inscripciones" },
+  { label: "Notificaciones", icon: Bell, path: "/notificaciones" },
+  { label: "Configuración", icon: Settings, path: "/configuracion" },
   { label: "Panel de Club", icon: Star, path: "/club", accent: true },
   { label: "Panel Admin", icon: Shield, path: "/admin", accent: true },
 ];
@@ -23,7 +23,6 @@ const Perfil = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-background" />
         <div className="relative px-4 pt-14 pb-6">
@@ -44,7 +43,6 @@ const Perfil = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 space-y-6">
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           {stats.map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="glass rounded-xl p-4 text-center">
@@ -55,7 +53,6 @@ const Perfil = () => {
           ))}
         </div>
 
-        {/* Level progress */}
         <div className="glass rounded-xl p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-display font-semibold text-foreground">Nivel 8</span>
@@ -66,7 +63,6 @@ const Perfil = () => {
           </div>
         </div>
 
-        {/* Menu */}
         <div className="space-y-1">
           {menuItems.map((item, i) => (
             <motion.button
@@ -86,7 +82,6 @@ const Perfil = () => {
           ))}
         </div>
 
-        {/* Logout */}
         <button className="w-full flex items-center justify-center gap-2 p-4 rounded-xl text-destructive hover:bg-destructive/10 transition-all">
           <LogOut className="w-4 h-4" />
           <span className="text-sm font-display font-medium">Cerrar sesión</span>
