@@ -107,6 +107,12 @@ const Index = () => {
 
         {/* CTA for organizers */}
         <CTASection />
+
+        {/* App Mockups */}
+        <AppMockups />
+
+        {/* Project Evaluator */}
+        <ProjectEvaluator />
       </div>
 
       <BottomNav />
