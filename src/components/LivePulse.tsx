@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Zap, TrendingUp, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -29,32 +29,25 @@ const LivePulse = () => {
         <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
         <span className="text-xs font-display font-semibold text-primary uppercase tracking-wider">Pulse en vivo</span>
       </div>
-      <AnimatePresenceWrapper currentIndex={currentIndex} current={current} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={current.id}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+          className="flex items-center gap-3"
+        >
+          <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+            <current.icon className="w-4 h-4 text-accent" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm text-foreground truncate">{current.text}</p>
+            <p className="text-xs text-muted-foreground">{current.time}</p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
-  );
-};
-
-const AnimatePresenceWrapper = ({ currentIndex, current }: { currentIndex: number; current: typeof pulseItems[0] }) => {
-  const { AnimatePresence } = require("framer-motion");
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={current.id}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.3 }}
-        className="flex items-center gap-3"
-      >
-        <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-          <current.icon className="w-4 h-4 text-accent" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm text-foreground truncate">{current.text}</p>
-          <p className="text-xs text-muted-foreground">{current.time}</p>
-        </div>
-      </motion.div>
-    </AnimatePresence>
   );
 };
 
