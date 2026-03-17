@@ -29,7 +29,7 @@ const BottomNav = () => {
               return (
                 <motion.button
                   key={item.id}
-                  onClick={() => setActive(item.id)}
+                  onClick={() => navigate(item.path)}
                   className="relative -mt-6 w-14 h-14 rounded-2xl bg-gradient-neon flex items-center justify-center glow-green"
                   whileTap={{ scale: 0.9 }}
                   whileHover={{ scale: 1.1 }}
