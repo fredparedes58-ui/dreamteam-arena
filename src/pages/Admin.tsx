@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Shield, Users, Trophy, BarChart3, AlertTriangle, CheckCircle, XCircle, Eye, Ban, TrendingUp, Activity, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const overviewStats = [
   { label: "Usuarios totales", value: "12,847", change: "+12%", icon: Users, color: "text-primary" },
@@ -11,17 +12,17 @@ const overviewStats = [
 ];
 
 const recentUsers = [
-  { name: "FC Barcelona Academy", type: "Club", status: "verified", date: "Hace 2h" },
-  { name: "CD Leganés Base", type: "Club", status: "pending", date: "Hace 5h" },
-  { name: "María López", type: "Entrenador", status: "verified", date: "Hace 1d" },
-  { name: "Real Sociedad Youth", type: "Club", status: "pending", date: "Hace 1d" },
-  { name: "Juan Pérez", type: "Padre/Madre", status: "verified", date: "Hace 2d" },
+  { id: 1, name: "FC Barcelona Academy", type: "Club", status: "verified", date: "Hace 2h" },
+  { id: 2, name: "CD Leganés Base", type: "Club", status: "pending", date: "Hace 5h" },
+  { id: 3, name: "María López", type: "Entrenador", status: "verified", date: "Hace 1d" },
+  { id: 4, name: "Real Sociedad Youth", type: "Club", status: "pending", date: "Hace 1d" },
+  { id: 5, name: "Juan Pérez", type: "Padre/Madre", status: "verified", date: "Hace 2d" },
 ];
 
 const pendingTournaments = [
-  { name: "Valencia Summer Cup", organizer: "Valencia CF Base", category: "Alevín", date: "Ago 2026" },
-  { name: "Basque Country League", organizer: "Athletic Bilbao Youth", category: "Infantil", date: "Sep 2026" },
-  { name: "Canarias Open", organizer: "UD Las Palmas Base", category: "Benjamín", date: "Jul 2026" },
+  { id: 5, name: "Valencia Summer Cup", organizer: "Valencia CF Base", category: "Alevín", date: "Ago 2026" },
+  { id: 6, name: "Basque Country League", organizer: "Athletic Bilbao Youth", category: "Infantil", date: "Sep 2026" },
+  { id: 7, name: "Canarias Open", organizer: "UD Las Palmas Base", category: "Benjamín", date: "Jul 2026" },
 ];
 
 const tabs = ["Overview", "Usuarios", "Torneos", "Incidencias"];
@@ -29,10 +30,22 @@ const tabs = ["Overview", "Usuarios", "Torneos", "Incidencias"];
 const Admin = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Overview");
+  const { toast } = useToast();
+  const [users, setUsers] = useState(recentUsers);
+  const [tournaments, setTournaments] = useState(pendingTournaments);
+
+  const handleVerifyUser = (id: number, action: "verify" | "reject") => {
+    setUsers((prev) => prev.map((u) => u.id === id ? { ...u, status: action === "verify" ? "verified" : "rejected" } : u));
+    toast({ title: action === "verify" ? "✅ Usuario verificado" : "❌ Usuario rechazado", description: `Acción completada` });
+  };
+
+  const handleTournament = (id: number, action: "approve" | "reject") => {
+    setTournaments((prev) => prev.filter((t) => t.id !== id));
+    toast({ title: action === "approve" ? "✅ Torneo aprobado" : "🚫 Torneo rechazado", description: `El torneo ha sido ${action === "approve" ? "aprobado y publicado" : "rechazado"}` });
+  };
 
   return (
     <div className="min-h-screen bg-background pb-8">
-      {/* Header */}
       <div className="sticky top-0 z-30 glass border-b border-border/50 px-4 pt-12 pb-2">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
@@ -56,7 +69,6 @@ const Admin = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 space-y-6 mt-4">
-        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {overviewStats.map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="glass rounded-xl p-4">
@@ -70,7 +82,6 @@ const Admin = () => {
           ))}
         </div>
 
-        {/* Activity chart placeholder */}
         <div className="glass rounded-xl p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-display font-bold text-foreground flex items-center gap-2">
@@ -90,14 +101,13 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Recent users */}
         <div className="glass rounded-xl p-4">
           <h2 className="text-sm font-display font-bold text-foreground mb-3 flex items-center gap-2">
             <Users className="w-4 h-4 text-accent" /> Usuarios recientes
           </h2>
           <div className="space-y-2">
-            {recentUsers.map((u) => (
-              <div key={u.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50 transition-all">
+            {users.map((u) => (
+              <div key={u.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50 transition-all">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
                     <Users className="w-3.5 h-3.5 text-muted-foreground" />
@@ -108,15 +118,15 @@ const Admin = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 text-[10px] font-display font-semibold rounded-full ${u.status === "verified" ? "bg-primary/10 text-primary" : "bg-pulse/10 text-pulse"}`}>
-                    {u.status === "verified" ? "Verificado" : "Pendiente"}
+                  <span className={`px-2 py-0.5 text-[10px] font-display font-semibold rounded-full ${u.status === "verified" ? "bg-primary/10 text-primary" : u.status === "rejected" ? "bg-destructive/10 text-destructive" : "bg-pulse/10 text-pulse"}`}>
+                    {u.status === "verified" ? "Verificado" : u.status === "rejected" ? "Rechazado" : "Pendiente"}
                   </span>
                   <div className="flex gap-1">
-                    <button className="w-6 h-6 rounded bg-secondary flex items-center justify-center hover:bg-primary/10"><Eye className="w-3 h-3 text-muted-foreground" /></button>
+                    <button onClick={() => toast({ title: "👁️ Viendo perfil", description: u.name })} className="w-6 h-6 rounded bg-secondary flex items-center justify-center hover:bg-primary/10"><Eye className="w-3 h-3 text-muted-foreground" /></button>
                     {u.status === "pending" && (
                       <>
-                        <button className="w-6 h-6 rounded bg-secondary flex items-center justify-center hover:bg-primary/10"><CheckCircle className="w-3 h-3 text-primary" /></button>
-                        <button className="w-6 h-6 rounded bg-secondary flex items-center justify-center hover:bg-destructive/10"><XCircle className="w-3 h-3 text-destructive" /></button>
+                        <button onClick={() => handleVerifyUser(u.id, "verify")} className="w-6 h-6 rounded bg-secondary flex items-center justify-center hover:bg-primary/10"><CheckCircle className="w-3 h-3 text-primary" /></button>
+                        <button onClick={() => handleVerifyUser(u.id, "reject")} className="w-6 h-6 rounded bg-secondary flex items-center justify-center hover:bg-destructive/10"><XCircle className="w-3 h-3 text-destructive" /></button>
                       </>
                     )}
                   </div>
@@ -126,25 +136,28 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Pending tournaments */}
         <div className="glass rounded-xl p-4">
           <h2 className="text-sm font-display font-bold text-foreground mb-3 flex items-center gap-2">
             <Trophy className="w-4 h-4 text-primary" /> Torneos pendientes de aprobación
           </h2>
-          <div className="space-y-2">
-            {pendingTournaments.map((t) => (
-              <div key={t.name} className="flex items-center justify-between p-3 rounded-lg glass border border-border/30">
-                <div>
-                  <p className="text-xs font-display font-bold text-foreground">{t.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{t.organizer} · {t.category} · {t.date}</p>
+          {tournaments.length === 0 ? (
+            <p className="text-xs text-muted-foreground text-center py-4 font-display">🎉 No hay torneos pendientes</p>
+          ) : (
+            <div className="space-y-2">
+              {tournaments.map((t) => (
+                <div key={t.id} className="flex items-center justify-between p-3 rounded-lg glass border border-border/30">
+                  <div>
+                    <p className="text-xs font-display font-bold text-foreground">{t.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{t.organizer} · {t.category} · {t.date}</p>
+                  </div>
+                  <div className="flex gap-1">
+                    <button onClick={() => handleTournament(t.id, "approve")} className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20"><CheckCircle className="w-3.5 h-3.5 text-primary" /></button>
+                    <button onClick={() => handleTournament(t.id, "reject")} className="w-7 h-7 rounded-lg bg-destructive/10 flex items-center justify-center hover:bg-destructive/20"><Ban className="w-3.5 h-3.5 text-destructive" /></button>
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  <button className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20"><CheckCircle className="w-3.5 h-3.5 text-primary" /></button>
-                  <button className="w-7 h-7 rounded-lg bg-destructive/10 flex items-center justify-center hover:bg-destructive/20"><Ban className="w-3.5 h-3.5 text-destructive" /></button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

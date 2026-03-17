@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import BottomNav from "@/components/BottomNav";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import tournament1 from "@/assets/tournament-1.jpg";
 import tournament2 from "@/assets/tournament-2.jpg";
@@ -26,6 +27,7 @@ const trendingSearches = ["Copa Verano 2026", "Torneos Madrid", "Benjamín Catal
 const Explorar = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const navigate = useNavigate();
 
   const filtered = allTournaments.filter((t) => {
     const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) || t.location.toLowerCase().includes(search.toLowerCase());
@@ -35,19 +37,13 @@ const Explorar = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
       <div className="sticky top-0 z-30 glass border-b border-border/50 px-4 pt-12 pb-4">
         <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-2xl font-display font-bold text-foreground mb-4">
           Explorar
         </motion.h1>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar torneos, ciudades..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 bg-secondary border-border/50 font-display text-sm"
-          />
+          <Input placeholder="Buscar torneos, ciudades..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-secondary border-border/50 font-display text-sm" />
           <button className="absolute right-3 top-1/2 -translate-y-1/2">
             <Filter className="w-4 h-4 text-accent" />
           </button>
@@ -55,7 +51,6 @@ const Explorar = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 space-y-6 mt-4">
-        {/* Trending */}
         <section>
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp className="w-4 h-4 text-primary" />
@@ -70,20 +65,14 @@ const Explorar = () => {
           </div>
         </section>
 
-        {/* Categories */}
         <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
           {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-display font-semibold whitespace-nowrap transition-all ${activeCategory === cat ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"}`}
-            >
+            <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-4 py-2 rounded-full text-xs font-display font-semibold whitespace-nowrap transition-all ${activeCategory === cat ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"}`}>
               {cat}
             </button>
           ))}
         </div>
 
-        {/* Results */}
         <section>
           <p className="text-sm text-muted-foreground mb-3 font-display">{filtered.length} torneos encontrados</p>
           <div className="space-y-3">
@@ -94,6 +83,7 @@ const Explorar = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
                 className="flex gap-4 glass rounded-xl p-3 cursor-pointer hover:border-primary/30 border border-transparent transition-all"
+                onClick={() => navigate(`/torneo/${t.id}`)}
               >
                 <img src={t.image} alt={t.name} className="w-20 h-20 rounded-lg object-cover flex-shrink-0" />
                 <div className="flex-1 min-w-0">

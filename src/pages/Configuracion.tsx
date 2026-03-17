@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Settings, User, Bell, Shield, Globe, Moon, Smartphone, CreditCard, HelpCircle, FileText, ChevronRight, Toggle } from "lucide-react";
+import { ArrowLeft, Settings, User, Bell, Shield, Globe, Moon, Smartphone, CreditCard, HelpCircle, FileText, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import BottomNav from "@/components/BottomNav";
