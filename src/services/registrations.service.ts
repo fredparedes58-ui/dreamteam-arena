@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { RegistrationStatus } from "@/types/domain";
 
 export const registrationsService = {
   async getByUser(userId: string) {
@@ -24,14 +25,14 @@ export const registrationsService = {
   async create(tournamentId: string, teamId: string, userId: string) {
     const { data, error } = await supabase
       .from("registrations")
-      .insert({ tournament_id: tournamentId, team_id: teamId, user_id: userId })
+      .insert([{ tournament_id: tournamentId, team_id: teamId, user_id: userId }])
       .select()
       .single();
     if (error) throw error;
     return data;
   },
 
-  async updateStatus(id: string, status: string) {
+  async updateStatus(id: string, status: RegistrationStatus) {
     const { data, error } = await supabase
       .from("registrations")
       .update({ status })

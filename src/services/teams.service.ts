@@ -26,7 +26,7 @@ export const teamsService = {
     const slug = input.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
     const { data, error } = await supabase
       .from("teams")
-      .insert({ ...input, owner_id: ownerId, slug })
+      .insert([{ name: input.name, category: input.category, city: input.city, description: input.description, owner_id: ownerId, slug }])
       .select()
       .single();
     if (error) throw error;
@@ -47,7 +47,7 @@ export const teamsService = {
   async addPlayer(input: PlayerInput, teamId: string) {
     const { data, error } = await supabase
       .from("players")
-      .insert({ ...input, team_id: teamId })
+      .insert([{ name: input.name, position: input.position, number: input.number, age: input.age, team_id: teamId }])
       .select()
       .single();
     if (error) throw error;
