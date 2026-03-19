@@ -35,7 +35,22 @@ export const tournamentsService = {
     const slug = input.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
     const { data, error } = await supabase
       .from("tournaments")
-      .insert([{ ...input, organizer_id: organizerId, slug, status: "draft" as const }])
+      .insert([{
+        name: input.name,
+        description: input.description,
+        location: input.location,
+        category: input.category,
+        format: input.format,
+        price: input.price,
+        max_teams: input.max_teams,
+        start_date: input.start_date,
+        end_date: input.end_date,
+        rules: input.rules,
+        included: input.included,
+        organizer_id: organizerId,
+        slug,
+        status: "draft" as const,
+      }])
       .select()
       .single();
     if (error) throw error;
