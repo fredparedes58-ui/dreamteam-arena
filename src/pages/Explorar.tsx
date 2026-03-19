@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchTournaments } from "@/hooks/use-tournaments";
 import { TournamentCardSkeleton } from "@/components/shared/Skeletons";
-import { EmptyState } from "@/components/shared/EmptyState";
+import EmptyState from "@/components/shared/EmptyState";
 
 const categories = ["Todos", "Prebenjamín", "Benjamín", "Alevín", "Infantil", "Cadete", "Juvenil"];
 const trendingSearches = ["Copa Verano 2026", "Torneos Madrid", "Benjamín Cataluña", "MIC", "Donosti Cup"];

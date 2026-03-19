@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTournaments } from "@/hooks/use-tournaments";
 import { TournamentCardSkeleton } from "@/components/shared/Skeletons";
-import { EmptyState } from "@/components/shared/EmptyState";
+import EmptyState from "@/components/shared/EmptyState";
 import type { TournamentStatus } from "@/types/domain";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
