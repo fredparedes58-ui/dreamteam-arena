@@ -5,35 +5,18 @@ import { Badge } from "@/components/ui/badge";
 import BottomNav from "@/components/BottomNav";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSearchTournaments } from "@/hooks/use-tournaments";
+import { TournamentCardSkeleton } from "@/components/shared/Skeletons";
+import EmptyState from "@/components/shared/EmptyState";
 
-import tournament1 from "@/assets/tournament-1.jpg";
-import tournament2 from "@/assets/tournament-2.jpg";
-import tournament3 from "@/assets/tournament-3.jpg";
-import tournament4 from "@/assets/tournament-4.jpg";
-
-const categories = ["Todos", "Benjamín", "Alevín", "Infantil", "Cadete", "Juvenil"];
-
-const allTournaments = [
-  { id: 1, name: "Costa Daurada Cup 2026", location: "Salou, Tarragona", category: "Benjamín", price: 195, rating: 4.8, image: tournament1, teams: 52, maxTeams: 64 },
-  { id: 2, name: "Pirineos Youth Championship", location: "Jaca, Huesca", category: "Alevín", price: 220, rating: 4.9, image: tournament2, teams: 38, maxTeams: 48 },
-  { id: 3, name: "Mediterranean Cup", location: "Palma, Mallorca", category: "Infantil", price: 250, rating: 4.6, image: tournament3, teams: 20, maxTeams: 32 },
-  { id: 4, name: "Madrid Night League", location: "Madrid", category: "Cadete", price: 180, rating: 4.7, image: tournament4, teams: 14, maxTeams: 16 },
-  { id: 5, name: "Barcelona Elite Cup", location: "Barcelona", category: "Juvenil", price: 300, rating: 4.9, image: tournament1, teams: 28, maxTeams: 32 },
-  { id: 6, name: "Andalucía Open", location: "Sevilla", category: "Benjamín", price: 160, rating: 4.5, image: tournament3, teams: 40, maxTeams: 48 },
-];
-
-const trendingSearches = ["Copa Verano 2026", "Torneos Madrid", "Benjamín Cataluña", "Fútbol playa"];
+const categories = ["Todos", "Prebenjamín", "Benjamín", "Alevín", "Infantil", "Cadete", "Juvenil"];
+const trendingSearches = ["Copa Verano 2026", "Torneos Madrid", "Benjamín Cataluña", "MIC", "Donosti Cup"];
 
 const Explorar = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
   const navigate = useNavigate();
-
-  const filtered = allTournaments.filter((t) => {
-    const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) || t.location.toLowerCase().includes(search.toLowerCase());
-    const matchCategory = activeCategory === "Todos" || t.category === activeCategory;
-    return matchSearch && matchCategory;
-  });
+  const { data: tournaments, isLoading } = useSearchTournaments(search, activeCategory);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -74,37 +57,50 @@ const Explorar = () => {
         </div>
 
         <section>
-          <p className="text-sm text-muted-foreground mb-3 font-display">{filtered.length} torneos encontrados</p>
+          <p className="text-sm text-muted-foreground mb-3 font-display">{tournaments?.length ?? 0} torneos encontrados</p>
           <div className="space-y-3">
-            {filtered.map((t, i) => (
-              <motion.div
-                key={t.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="flex gap-4 glass rounded-xl p-3 cursor-pointer hover:border-primary/30 border border-transparent transition-all"
-                onClick={() => navigate(`/torneo/${t.id}`)}
-              >
-                <img src={t.image} alt={t.name} className="w-20 h-20 rounded-lg object-cover flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-display font-bold text-foreground text-sm truncate">{t.name}</h3>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                    <MapPin className="w-3 h-3 text-accent" />
-                    <span>{t.location}</span>
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent font-display">{t.category}</span>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-primary fill-primary" />
-                        <span className="text-xs font-semibold text-foreground">{t.rating}</span>
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, i) => <TournamentCardSkeleton key={i} />)
+            ) : !tournaments?.length ? (
+              <EmptyState
+                title="Sin resultados"
+                description="No se encontraron torneos con esos filtros."
+                actionLabel="Limpiar filtros"
+                onAction={() => { setSearch(""); setActiveCategory("Todos"); }}
+              />
+            ) : (
+              tournaments.map((t, i) => (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="flex gap-4 glass rounded-xl p-3 cursor-pointer hover:border-primary/30 border border-transparent transition-all"
+                  onClick={() => navigate(`/torneo/${t.id}`)}
+                >
+                  <img src={t.image_url || "/placeholder.svg"} alt={t.name} className="w-20 h-20 rounded-lg object-cover flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-display font-bold text-foreground text-sm truncate">{t.name}</h3>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                      <MapPin className="w-3 h-3 text-accent" />
+                      <span>{t.location}</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent font-display">{t.category}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-primary fill-primary" />
+                          <span className="text-xs font-semibold text-foreground">{t.rating ?? 0}</span>
+                        </div>
+                        <span className="text-sm font-display font-bold text-primary">
+                          {(t.price ?? 0) === 0 ? "Gratis" : `€${t.price}`}
+                        </span>
                       </div>
-                      <span className="text-sm font-display font-bold text-primary">€{t.price}</span>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))
+            )}
           </div>
         </section>
       </div>

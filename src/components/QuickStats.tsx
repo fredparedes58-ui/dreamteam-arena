@@ -1,14 +1,25 @@
 import { motion } from "framer-motion";
 import { Trophy, MapPin, TrendingUp, Calendar } from "lucide-react";
-
-const stats = [
-  { icon: Trophy, value: "12", label: "Torneos esta semana", color: "text-primary" },
-  { icon: MapPin, value: "8", label: "Ciudades activas", color: "text-accent" },
-  { icon: TrendingUp, value: "94%", label: "Tasa de ocupación", color: "text-primary" },
-  { icon: Calendar, value: "Jun", label: "Temporada alta", color: "text-pulse" },
-];
+import { useTournaments } from "@/hooks/use-tournaments";
 
 const QuickStats = () => {
+  const { data: tournaments } = useTournaments();
+
+  const all = tournaments ?? [];
+  const totalActive = all.filter(t => t.status !== "draft" && t.status !== "cancelled").length;
+  const cities = new Set(all.map(t => t.location?.split(",")[0]?.trim()).filter(Boolean)).size;
+  const totalTeams = all.reduce((sum, t) => sum + (t.current_teams ?? 0), 0);
+  const totalSlots = all.reduce((sum, t) => sum + (t.max_teams ?? 0), 0);
+  const occupancy = totalSlots > 0 ? Math.round((totalTeams / totalSlots) * 100) : 0;
+  const liveCount = all.filter(t => t.status === "live").length;
+
+  const stats = [
+    { icon: Trophy, value: String(totalActive), label: "Torneos activos", color: "text-primary" },
+    { icon: MapPin, value: String(cities), label: "Ciudades", color: "text-accent" },
+    { icon: TrendingUp, value: `${occupancy}%`, label: "Ocupación media", color: "text-primary" },
+    { icon: Calendar, value: String(liveCount), label: "En directo", color: "text-pulse" },
+  ];
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {stats.map((stat, i) => (

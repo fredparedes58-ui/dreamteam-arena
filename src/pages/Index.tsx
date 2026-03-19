@@ -8,81 +8,24 @@ import CTASection from "@/components/CTASection";
 import ProjectEvaluator from "@/components/ProjectEvaluator";
 import AppMockups from "@/components/AppMockups";
 import { motion } from "framer-motion";
-
-import tournament1 from "@/assets/tournament-1.jpg";
-import tournament2 from "@/assets/tournament-2.jpg";
-import tournament3 from "@/assets/tournament-3.jpg";
-import tournament4 from "@/assets/tournament-4.jpg";
-
-const tournaments = [
-  {
-    id: 1,
-    name: "Costa Daurada Cup 2026",
-    location: "Salou, Tarragona",
-    date: "15-19 Junio 2026",
-    category: "Benjamín",
-    price: 195,
-    teams: 52,
-    maxTeams: 64,
-    rating: 4.8,
-    image: tournament1,
-    featured: true,
-    spotsLeft: 12,
-  },
-  {
-    id: 2,
-    name: "Pirineos Youth Championship",
-    location: "Jaca, Huesca",
-    date: "22-25 Julio 2026",
-    category: "Alevín",
-    price: 220,
-    teams: 38,
-    maxTeams: 48,
-    rating: 4.9,
-    image: tournament2,
-    featured: true,
-    spotsLeft: 10,
-  },
-  {
-    id: 3,
-    name: "Mediterranean Cup",
-    location: "Palma, Mallorca",
-    date: "5-8 Agosto 2026",
-    category: "Infantil",
-    price: 250,
-    teams: 20,
-    maxTeams: 32,
-    rating: 4.6,
-    image: tournament3,
-  },
-  {
-    id: 4,
-    name: "Madrid Night League",
-    location: "Madrid",
-    date: "10-12 Julio 2026",
-    category: "Cadete",
-    price: 180,
-    teams: 14,
-    maxTeams: 16,
-    rating: 4.7,
-    image: tournament4,
-    spotsLeft: 2,
-  },
-];
+import { useState } from "react";
+import { useSearchTournaments } from "@/hooks/use-tournaments";
+import { TournamentCardSkeleton } from "@/components/shared/Skeletons";
 
 const Index = () => {
+  const [category, setCategory] = useState("Todos");
+  const { data: tournaments, isLoading } = useSearchTournaments("", category);
+
+  const featured = (tournaments ?? []).slice(0, 4);
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <HeroSection />
 
       <div className="max-w-6xl mx-auto px-4 space-y-8 -mt-8 relative z-20">
-        {/* Live Pulse */}
         <LivePulse />
-
-        {/* Quick Stats */}
         <QuickStats />
 
-        {/* Tournaments Section */}
         <section>
           <motion.div
             className="flex items-center justify-between mb-4"
@@ -96,22 +39,18 @@ const Index = () => {
             <button onClick={() => window.location.href = "/torneos"} className="text-sm text-accent font-display hover:underline">Ver todos</button>
           </motion.div>
 
-          <CategoryFilter />
+          <CategoryFilter active={category} onChange={setCategory} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 mt-4">
-            {tournaments.map((tournament, i) => (
-              <TournamentCard key={tournament.id} tournament={tournament} index={i} />
-            ))}
+            {isLoading
+              ? Array.from({ length: 4 }).map((_, i) => <TournamentCardSkeleton key={i} />)
+              : featured.map((t, i) => <TournamentCard key={t.id} tournament={t} index={i} />)
+            }
           </div>
         </section>
 
-        {/* CTA for organizers */}
         <CTASection />
-
-        {/* App Mockups */}
         <AppMockups />
-
-        {/* Project Evaluator */}
         <ProjectEvaluator />
       </div>
 
