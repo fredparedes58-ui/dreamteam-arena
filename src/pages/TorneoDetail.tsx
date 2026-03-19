@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, Calendar, Users, Star, Share2, Heart, DollarSign, Shield, CheckCircle, Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -5,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { useTournament } from "@/hooks/use-tournaments";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import RegisterTeamDialog from "@/components/RegisterTeamDialog";
 
 const TorneoDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: t, isLoading, error } = useTournament(id || "");
+  const [registerOpen, setRegisterOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -40,7 +43,6 @@ const TorneoDetail = () => {
 
   return (
     <div className="min-h-screen bg-background pb-8">
-      {/* Hero image */}
       <div className="relative h-72">
         <img src={t.image_url || "/placeholder.svg"} alt={t.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
@@ -49,18 +51,13 @@ const TorneoDetail = () => {
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <div className="flex gap-2">
-            <button className="w-10 h-10 rounded-full glass flex items-center justify-center">
-              <Share2 className="w-5 h-5 text-foreground" />
-            </button>
-            <button className="w-10 h-10 rounded-full glass flex items-center justify-center">
-              <Heart className="w-5 h-5 text-foreground" />
-            </button>
+            <button className="w-10 h-10 rounded-full glass flex items-center justify-center"><Share2 className="w-5 h-5 text-foreground" /></button>
+            <button className="w-10 h-10 rounded-full glass flex items-center justify-center"><Heart className="w-5 h-5 text-foreground" /></button>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 -mt-12 relative z-10 space-y-6">
-        {/* Title */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-2 mb-2">
             <span className="px-3 py-1 text-xs font-display font-semibold rounded-full bg-accent/20 text-accent border border-accent/30">{t.category}</span>
@@ -72,7 +69,6 @@ const TorneoDetail = () => {
           <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">{t.name}</h1>
         </motion.div>
 
-        {/* Info grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { icon: MapPin, label: "Ubicación", value: t.location || "TBD" },
@@ -88,7 +84,6 @@ const TorneoDetail = () => {
           ))}
         </div>
 
-        {/* Capacity */}
         <div className="glass rounded-xl p-4">
           <div className="flex justify-between text-sm mb-2">
             <span className="font-display text-muted-foreground">Ocupación</span>
@@ -99,7 +94,6 @@ const TorneoDetail = () => {
           </div>
         </div>
 
-        {/* Description */}
         {t.description && (
           <div>
             <h2 className="text-lg font-display font-bold text-foreground mb-2">Descripción</h2>
@@ -107,7 +101,6 @@ const TorneoDetail = () => {
           </div>
         )}
 
-        {/* Format */}
         {t.format && (
           <div className="glass rounded-xl p-4">
             <p className="text-xs text-muted-foreground font-display">Formato</p>
@@ -115,37 +108,32 @@ const TorneoDetail = () => {
           </div>
         )}
 
-        {/* Rules */}
         {t.rules && t.rules.length > 0 && (
           <div>
             <h2 className="text-lg font-display font-bold text-foreground mb-2">Reglas</h2>
             <div className="grid grid-cols-2 gap-2">
               {t.rules.map((rule: string) => (
                 <div key={rule} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle className="w-3 h-3 text-primary flex-shrink-0" />
-                  <span>{rule}</span>
+                  <CheckCircle className="w-3 h-3 text-primary flex-shrink-0" /><span>{rule}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Included */}
         {t.included && t.included.length > 0 && (
           <div>
             <h2 className="text-lg font-display font-bold text-foreground mb-2">Incluido</h2>
             <div className="grid grid-cols-2 gap-2">
               {t.included.map((item: string) => (
                 <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle className="w-3 h-3 text-accent flex-shrink-0" />
-                  <span>{item}</span>
+                  <CheckCircle className="w-3 h-3 text-accent flex-shrink-0" /><span>{item}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* CTA */}
         <motion.div className="sticky bottom-4 z-20" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <div className="glass rounded-2xl p-4 flex items-center justify-between">
             <div>
@@ -154,12 +142,14 @@ const TorneoDetail = () => {
               </p>
               <p className="text-xs text-muted-foreground">por equipo</p>
             </div>
-            <Button className="bg-gradient-neon text-primary-foreground font-display font-bold px-8 py-6 rounded-xl text-base glow-green">
+            <Button onClick={() => setRegisterOpen(true)} className="bg-gradient-neon text-primary-foreground font-display font-bold px-8 py-6 rounded-xl text-base glow-green">
               Inscribir equipo
             </Button>
           </div>
         </motion.div>
       </div>
+
+      <RegisterTeamDialog tournament={t} open={registerOpen} onOpenChange={setRegisterOpen} />
     </div>
   );
 };
