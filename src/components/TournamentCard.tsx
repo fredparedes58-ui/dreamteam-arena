@@ -1,26 +1,21 @@
 import { motion } from "framer-motion";
 import { MapPin, Calendar, Users, Star, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-interface Tournament {
-  id: number;
-  name: string;
-  location: string;
-  date: string;
-  category: string;
-  price: number;
-  teams: number;
-  maxTeams: number;
-  rating: number;
-  image: string;
-  featured?: boolean;
-  spotsLeft?: number;
-}
+import type { Tournament } from "@/types/domain";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 const TournamentCard = ({ tournament, index }: { tournament: Tournament; index: number }) => {
   const navigate = useNavigate();
-  const fillPercent = Math.round((tournament.teams / tournament.maxTeams) * 100);
+  const currentTeams = tournament.current_teams ?? 0;
+  const maxTeams = tournament.max_teams ?? 16;
+  const fillPercent = Math.round((currentTeams / maxTeams) * 100);
   const isAlmostFull = fillPercent > 80;
+  const spotsLeft = maxTeams - currentTeams;
+
+  const dateStr = tournament.start_date
+    ? format(new Date(tournament.start_date), "d MMM yyyy", { locale: es })
+    : "Por confirmar";
 
   return (
     <motion.div
@@ -35,17 +30,21 @@ const TournamentCard = ({ tournament, index }: { tournament: Tournament; index: 
     >
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
-        <img src={tournament.image} alt={tournament.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+        <img
+          src={tournament.image_url || "/placeholder.svg"}
+          alt={tournament.name}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-        
+
         {/* Badges */}
         <div className="absolute top-3 left-3 flex gap-2">
           <span className="px-3 py-1 text-xs font-display font-semibold rounded-full bg-accent/20 text-accent border border-accent/30 backdrop-blur-sm">
             {tournament.category}
           </span>
-          {tournament.featured && (
-            <span className="px-3 py-1 text-xs font-display font-semibold rounded-full bg-primary/20 text-primary border border-primary/30 backdrop-blur-sm animate-pulse-glow">
-              DESTACADO
+          {tournament.status === "live" && (
+            <span className="px-3 py-1 text-xs font-display font-semibold rounded-full bg-pulse/20 text-pulse border border-pulse/30 backdrop-blur-sm animate-pulse-glow">
+              EN VIVO
             </span>
           )}
         </div>
@@ -53,7 +52,7 @@ const TournamentCard = ({ tournament, index }: { tournament: Tournament; index: 
         {isAlmostFull && (
           <div className="absolute top-3 right-3">
             <span className="px-3 py-1 text-xs font-display font-semibold rounded-full bg-pulse/20 text-pulse border border-pulse/30 backdrop-blur-sm">
-              ¡{tournament.spotsLeft || tournament.maxTeams - tournament.teams} plazas!
+              ¡{spotsLeft} plazas!
             </span>
           </div>
         )}
@@ -72,11 +71,11 @@ const TournamentCard = ({ tournament, index }: { tournament: Tournament; index: 
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="w-3.5 h-3.5 text-accent" />
-            <span>{tournament.date}</span>
+            <span>{dateStr}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="w-3.5 h-3.5 text-accent" />
-            <span>{tournament.teams}/{tournament.maxTeams} equipos</span>
+            <span>{currentTeams}/{maxTeams} equipos</span>
           </div>
         </div>
 
@@ -97,10 +96,12 @@ const TournamentCard = ({ tournament, index }: { tournament: Tournament; index: 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-primary fill-primary" />
-            <span className="text-sm font-semibold text-foreground">{tournament.rating}</span>
+            <span className="text-sm font-semibold text-foreground">{tournament.rating ?? 0}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xl font-display font-bold text-primary">€{tournament.price}</span>
+            <span className="text-xl font-display font-bold text-primary">
+              {(tournament.price ?? 0) === 0 ? "Gratis" : `€${tournament.price}`}
+            </span>
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all">
               <ArrowRight className="w-4 h-4 text-primary group-hover:text-primary-foreground" />
             </div>
@@ -112,4 +113,3 @@ const TournamentCard = ({ tournament, index }: { tournament: Tournament; index: 
 };
 
 export default TournamentCard;
-export type { Tournament };
