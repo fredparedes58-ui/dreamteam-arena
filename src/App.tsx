@@ -3,44 +3,70 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import Explorar from "./pages/Explorar.tsx";
-import Torneos from "./pages/Torneos.tsx";
-import Perfil from "./pages/Perfil.tsx";
-import TorneoDetail from "./pages/TorneoDetail.tsx";
-import Club from "./pages/Club.tsx";
-import Admin from "./pages/Admin.tsx";
-import Notificaciones from "./pages/Notificaciones.tsx";
-import MiEquipo from "./pages/MiEquipo.tsx";
-import Inscripciones from "./pages/Inscripciones.tsx";
-import Configuracion from "./pages/Configuracion.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import ProtectedRoute from "@/components/shared/ProtectedRoute";
+import Index from "./pages/Index";
+import Explorar from "./pages/Explorar";
+import Torneos from "./pages/Torneos";
+import Perfil from "./pages/Perfil";
+import TorneoDetail from "./pages/TorneoDetail";
+import Club from "./pages/Club";
+import Admin from "./pages/Admin";
+import Notificaciones from "./pages/Notificaciones";
+import MiEquipo from "./pages/MiEquipo";
+import Inscripciones from "./pages/Inscripciones";
+import Configuracion from "./pages/Configuracion";
+import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
+import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/explorar" element={<Explorar />} />
-          <Route path="/torneos" element={<Torneos />} />
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/torneo/:id" element={<TorneoDetail />} />
-          <Route path="/club" element={<Club />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/notificaciones" element={<Notificaciones />} />
-          <Route path="/mi-equipo" element={<MiEquipo />} />
-          <Route path="/inscripciones" element={<Inscripciones />} />
-          <Route path="/configuracion" element={<Configuracion />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Public */}
+              <Route path="/" element={<Index />} />
+              <Route path="/explorar" element={<Explorar />} />
+              <Route path="/torneos" element={<Torneos />} />
+              <Route path="/torneo/:id" element={<TorneoDetail />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+
+              {/* Authenticated */}
+              <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+              <Route path="/notificaciones" element={<ProtectedRoute><Notificaciones /></ProtectedRoute>} />
+              <Route path="/mi-equipo" element={<ProtectedRoute><MiEquipo /></ProtectedRoute>} />
+              <Route path="/inscripciones" element={<ProtectedRoute><Inscripciones /></ProtectedRoute>} />
+              <Route path="/configuracion" element={<ProtectedRoute><Configuracion /></ProtectedRoute>} />
+
+              {/* Club role */}
+              <Route path="/club" element={<ProtectedRoute requiredRole="club"><Club /></ProtectedRoute>} />
+
+              {/* Admin role */}
+              <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><Admin /></ProtectedRoute>} />
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
